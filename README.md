@@ -10,10 +10,10 @@ server/
   memory.py     — Memory Stream, Reflection, Planning
 
 unity/Assets/Scripts/
-  NPCClient.cs          — Push-to-Talk, sends audio to server
+  NPCClient.cs           — Push-to-Talk, sends audio to server
   WorldContextBuilder.cs — Builds world context JSON
-  NPCController.cs      — Applies NPC decisions (point, quest, shop)
-  NPCResponse.cs        — JSON response structure
+  NPCController.cs       — Applies NPC decisions (point, quest, shop)
+  NPCResponse.cs         — JSON response structure
 ```
 
 ## Setup
