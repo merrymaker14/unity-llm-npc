@@ -56,6 +56,8 @@ public class NPCClient : MonoBehaviour
         if (_isRecording) return;
         _isRecording = true;
         _clip = Microphone.Start(null, false, maxSeconds, 16000);
+        // 16000 Hz — standard for STT. For device compatibility check:
+        // Microphone.GetDeviceCaps(null, out int minFreq, out int maxFreq)
         Debug.Log("[Voice] Recording... (hold Space)");
     }
 
@@ -97,16 +99,18 @@ public class NPCClient : MonoBehaviour
 
         if (www.result == UnityWebRequest.Result.Success)
         {
-            // Read JSON decision from response header
             string decisionJson = www.GetResponseHeader("X-NPC-Decision");
-
-            // Play audio response
             AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-            GetComponent<AudioSource>().PlayOneShot(clip);
 
-            // Apply NPC action
             if (!string.IsNullOrEmpty(decisionJson))
+            {
                 GetComponent<NPCController>().ApplyDecision(decisionJson, clip);
+            }
+            else
+            {
+                // Header empty — just play audio
+                GetComponent<AudioSource>().PlayOneShot(clip);
+            }
 
             Debug.Log("[Voice] NPC says: " + decisionJson);
         }

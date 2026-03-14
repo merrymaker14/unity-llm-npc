@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import FileResponse
 from faster_whisper import WhisperModel
-from memory import add_memory, get_recent_memories, load_memories, reflect, get_or_create_plan
+from memory import add_memory, get_recent_memories, reflect, get_or_create_plan, get_interaction_count
 import edge_tts
 import ollama
 import json
@@ -60,18 +60,18 @@ async def voice(
     segments, _ = whisper.transcribe(path)
     player_text = " ".join(s.text for s in segments).strip()
 
-    # Memory — record what player said
-    add_memory(npc_id, f"Player said: '{player_text}'")
+    # Memory — record interaction and increment counter
+    add_memory(npc_id, f"Player said: '{player_text}'", count_interaction=True)
 
     # Reflection every 5 interactions
-    memories = load_memories(npc_id)
-    if len(memories) % 5 == 0:
+    count = get_interaction_count(npc_id)
+    if count % 5 == 0:
         insights = reflect(npc_id)
         if insights:
             print(f"[REFLECTION] {insights}")
 
     recent   = get_recent_memories(npc_id, n=8)
-    npc_plan = get_or_create_plan(npc_id)
+    npc_plan = get_or_create_plan(npc_id)  # updates every 10 interactions
     print(f"[PLAN] {npc_plan}")
 
     # LLM — generate structured response
